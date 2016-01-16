@@ -1,0 +1,67 @@
+box: google/golang
+dev:
+  steps:
+    - script:
+        code: |
+            export
+    - internal/shell
+build:
+  steps:
+    - script:
+        name: overwrite GOPATH
+        code: |
+          export GOPATH="/go" && \
+          export PACKAGE="github.com/stepanstipl/oauth2_proxy" && \
+          export PACKAGE_UPSTREAM="github.com/bitly/oauth2_proxy" && \
+          mkdir -p "${GOPATH}/src/github.com/bitly" && \
+          ln -s "${WERCKER_SOURCE_DIR}" "${GOPATH}/src/${PACKAGE_UPSTREAM}" && \
+          mkdir -p "${GOPATH}/src/github.com/stepanstipl" && \
+          ln -s "${WERCKER_SOURCE_DIR}" "${GOPATH}/src/${PACKAGE}"
+    - script:
+        name: get gpm
+        code: |
+          curl -s https://raw.githubusercontent.com/pote/gpm/v1.3.2/bin/gpm | bash
+    - script:
+        name: go build
+        code: |
+          CGO_ENABLED=0 go build -a -ldflags '-s' -v $PACKAGE
+#    - script:
+#        name: go test
+#        code: |
+#          go test -v $PACKAGE
+    - script:
+        name: create oauth2_proxy binary archive
+        code: |
+          tar zcvf "${WERCKER_OUTPUT_DIR}/oauth2_proxy.tar.gz" oauth2_proxy
+    - script:
+        name: output release tag
+        code: |
+          git describe --tags --exact --match 'v*' | tee "${WERCKER_OUTPUT_DIR}/.release_tag" || true
+    - script:
+        name: wercker debug
+        code: |
+          ls -al $WERCKER_OUTPUT_DIR
+deploy:
+  steps:
+    - script:
+        name: restore release tag
+        code: |
+          echo $WERCKER_ROOT && \
+          ls -al $WERCKER_ROOT && \
+          export MY_RELEASE_TAG=$(cat $WERCKER_ROOT/.release_tag) && \
+          echo "Release tag: ${MY_RELEASE_TAG}"
+    - github-create-release:
+        token: $GITHUB_TOKEN
+        tag: $MY_RELEASE_TAG
+    - github-upload-asset:
+        token: $GITHUB_TOKEN
+        file: oauth2_proxy.tar.gz
+        content_type: application/x-gzip
+    - internal/docker-scratch-push:
+        username: $QUAY_USERNAME
+        password: $QUAY_PASSWORD
+        cmd: /oauth2_proxy
+        tag: $MY_RELEASE_TAG
+        ports: "4180"
+        repository: quay.io/stepanstipl/oauth2_proxy
+        registry: https://quay.io

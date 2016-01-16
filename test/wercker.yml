@@ -1,0 +1,22 @@
+box: google/golang
+build:
+  steps:
+    - script:
+        name: test
+        code: |
+          export && \
+          echo "testing..." > "${WERCKER_OUTPUT_DIR}/test_file" && \
+          echo "${WERCKER_OUTPUT_DIR}/test_file" && \
+          echo "${WERCKER_OUTPUT_DIR}" && \
+          ls -al $WERCKER_OUTPUT_DIR\
+deploy:
+  steps:
+    - script:
+        name: restore
+        code: |
+          pwd && \
+          ls -al && \
+          cat test_file
+    - script:
+        name: restore
+        script: echo TEST
