@@ -1,10 +1,4 @@
 box: google/golang
-dev:
-  steps:
-    - script:
-        code: |
-            export
-    - internal/shell
 build:
   steps:
     - script:
