@@ -18,7 +18,7 @@ build:
     - script:
         name: go build
         code: |
-          CGO_ENABLED=0 go build -a -ldflags '-s' --tags netgo --installsuffix netgo -v $PACKAGE 
+          CGO_ENABLED=0 go build -a -ldflags '-s' --tags netgo --installsuffix netgo -v $PACKAGE
 #    - script:
 #        name: go test
 #        code: |
@@ -31,6 +31,10 @@ build:
         name: output release tag
         code: |
           git describe --tags --exact --match 'v*' | tee "${WERCKER_OUTPUT_DIR}/.release_tag" || true
+    - script:
+        name: add CA certs
+        code: |
+          mkdir -p "${WERCKER_OUTPUT_DIR}/etc/ssl/certs" && cp ca-certificates.crt "${WERCKER_OUTPUT_DIR}/etc/ssl/certs/" 
     - script:
         name: wercker debug
         code: |
