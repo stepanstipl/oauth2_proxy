@@ -55,6 +55,10 @@ deploy:
         name: get greenpeace wrapper
         code: |
           curl -sL https://github.com/stepanstipl/greenpeace/releases/download/0.1.3/greenpeace.tar.gz | tar -xvzf -
+    - script:
+        name: extract oauth2_proxy
+        code: |
+          tar -xvzf oauth2_proxy.tar.gz && rm -f oauth2_proxy.tar.gz
     - internal/docker-scratch-push:
         username: $QUAY_USERNAME
         password: $QUAY_PASSWORD
