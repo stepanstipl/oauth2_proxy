@@ -58,7 +58,7 @@ deploy:
     - script:
         name: get greenpeace wrapper
         code: |
-          curl -sL https://github.com/stepanstipl/greenpeace/releases/download/0.1.4/greenpeace.tar.gz | tar -xvzf -
+          curl -sL https://github.com/stepanstipl/greenpeace/releases/download/0.1.5/greenpeace.tar.gz | tar -xvzf -
     - script:
         name: extract oauth2_proxy
         code: |
