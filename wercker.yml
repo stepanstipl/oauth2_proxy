@@ -1,5 +1,5 @@
 box: google/golang
-no-response-timeout: 10
+no-response-timeout: 30
 build:
   steps:
     - script:
